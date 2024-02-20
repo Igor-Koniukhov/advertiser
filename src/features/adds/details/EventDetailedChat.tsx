@@ -3,7 +3,7 @@ export const EventDetailedChat = () => {
   return (
     <>
       <Segment textAlign="center" attached="top" inverted color="teal" style={{ border: "none" }}>
-        <Header>Chat about this event</Header>
+        <Header>Chat </Header>
       </Segment>
 
       <Segment attached>

@@ -1,19 +1,24 @@
-import {Button, Container, Header, Icon, Image, Segment} from "semantic-ui-react"
-import {Link} from "react-router-dom";
+import { Button, Container, Header, Icon, Image, Segment } from "semantic-ui-react"
+import { Link } from "react-router-dom"
 
 export default function HomePage() {
-    return (
-        <Segment inverted textAlign="center" vertical className="masthead">
-            <Container>
-                <Header>
-                    <Image size="massive" src="/logo.png" alt="logo" style={{marginBottom: 12}}/>
-                    Re-vents
-                </Header>
-                <Button size="huge" inverted as={Link} to="/events">
-                    Get started
-                    <Icon name="caret right" inverted/>
-                </Button>
-            </Container>
-        </Segment>
-    )
+  return (
+    <Segment inverted textAlign="center" vertical className="masthead">
+      <Container>
+        <Header>
+          <Image
+            size="massive"
+            src="/advertiser-white.png"
+            alt="logo"
+            style={{ marginBottom: 12 }}
+          />
+          Event Advertiser
+        </Header>
+        <Button size="huge" inverted as={Link} to="/adds">
+          Get started
+          <Icon name="caret right" inverted />
+        </Button>
+      </Container>
+    </Segment>
+  )
 }

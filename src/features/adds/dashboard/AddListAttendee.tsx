@@ -5,10 +5,10 @@ type Props = {
   attendee: Attendee
 }
 
-export default function EventListAttendee({attendee}: Props) {
+export default function AddListAttendee({ attendee }: Props) {
   return (
     <List.Item>
-      <Image size='mini' circular src={attendee.photoURL}/>
+      <Image size="mini" circular src={attendee.photoURL} />
     </List.Item>
   )
 }

@@ -1,15 +1,17 @@
 import { Button, Form, Header, Segment } from "semantic-ui-react"
 import { Link, useNavigate } from "react-router-dom"
 import { useParams } from "react-router"
-import { useAppDispatch, useAppSelector } from "@/app/store/store.ts"
+import { useAppSelector } from "@/app/store/store.ts"
 import { Controller, FieldValues, useForm } from "react-hook-form"
-import { categoryOptions } from "@/features/events/form/categoryOptions.ts"
+import { categoryOptions } from "@/features/adds/form/categoryOptions.ts"
 import DataPicker from "react-datepicker"
 import "react-datepicker/dist/react-datepicker.css"
-import { createId } from "@paralleldrive/cuid2"
-import { createEvent, updateEvent } from "@/features/events/eventSlice.ts"
+import { AppEvent } from "@/app/types/event.ts"
+import { db } from "@/app/config/firebase.ts"
+import { collection, doc, setDoc, Timestamp, updateDoc } from "@firebase/firestore"
+import { toast } from "react-toastify"
 
-export default function EventForm() {
+export default function AddsForm() {
   const {
     register,
     handleSubmit,
@@ -17,27 +19,42 @@ export default function EventForm() {
     setValue,
     formState: { errors, isValid, isSubmitting },
   } = useForm({ mode: "onTouched" })
-  let { id } = useParams()
-  const event = useAppSelector((state) => state.events.events.find((e) => e.id === id))
-  const dispatch = useAppDispatch()
+  const { id } = useParams()
+  const add = useAppSelector((state) => state.adds.adds.find((e) => e.id === id))
   const navigate = useNavigate()
 
-  const onSubmit = (data: FieldValues) => {
-    console.log(data)
-    id = id ?? createId()
-    event
-      ? dispatch(updateEvent({ ...event, ...data, date: data.date.toString() }))
-      : dispatch(
-          createEvent({
-            ...data,
-            id,
-            hostedBy: "bob",
-            attendees: [],
-            hostPhotoURL: "",
-            date: data.date.toString(),
-          }),
-        )
-    navigate(`/events/${id}`)
+  const updateAddvertise = async (data: AppEvent) => {
+    if (!add) return
+    const docRef = doc(db, "adds", add.id as string)
+    await updateDoc(docRef, {
+      ...data,
+      date: Timestamp.fromDate(data.date as unknown as Date),
+    })
+  }
+  const createAddvertise = async (data: FieldValues) => {
+    const newEventRef = doc(collection(db, "adds"))
+    await setDoc(newEventRef, {
+      ...data,
+      hostedBy: "bob",
+      attendees: [],
+      hostPhotoURL: "",
+      date: Timestamp.fromDate(data.date as unknown as Date),
+    })
+    return newEventRef
+  }
+
+  const onSubmit = async (data: FieldValues) => {
+    try {
+      if (add) {
+        await updateAddvertise({ ...add, ...data })
+        navigate(`/adds/${add.id}`)
+      } else {
+        const ref = await createAddvertise(data)
+        navigate(`/adds/${ref.id}`)
+      }
+    } catch (error) {
+      toast.error((error as unknown as Error).message as string)
+    }
   }
 
   return (
@@ -47,7 +64,7 @@ export default function EventForm() {
         <Form onSubmit={handleSubmit(onSubmit)}>
           <Form.Input
             placeholder="Event title"
-            defaultValue={event?.title || ""}
+            defaultValue={add?.title || ""}
             {...register("title", { required: true })}
             error={errors.title && "Title is required"}
           />
@@ -55,7 +72,7 @@ export default function EventForm() {
             name="category"
             control={control}
             rules={{ required: "Category is required" }}
-            defaultValue={event?.category}
+            defaultValue={add?.category}
             render={({ field }) => (
               <Form.Select
                 options={categoryOptions}
@@ -70,20 +87,20 @@ export default function EventForm() {
 
           <Form.TextArea
             placeholder="Description"
-            defaultValue={event?.description || ""}
+            defaultValue={add?.description || ""}
             {...register("description", { required: "Description is required" })}
             error={errors.category && errors.category.message}
           />
           <Header sub content="Location details" color="teal" />
           <Form.Input
             placeholder="City"
-            defaultValue={event?.city || ""}
+            defaultValue={add?.city || ""}
             {...register("city", { required: "City is required" })}
             error={errors.category && errors.category.message}
           />
           <Form.Input
             placeholder="Venue"
-            defaultValue={event?.venue || ""}
+            defaultValue={add?.venue || ""}
             {...register("venue", { required: "Venue is required" })}
             error={errors.category && errors.category.message}
           />
@@ -92,7 +109,7 @@ export default function EventForm() {
               name="date"
               control={control}
               rules={{ required: "Date is required" }}
-              defaultValue={(event && new Date(event.date)) || null}
+              defaultValue={(add && new Date(add.date)) || null}
               render={({ field }) => (
                 <DataPicker
                   selected={field.value}
