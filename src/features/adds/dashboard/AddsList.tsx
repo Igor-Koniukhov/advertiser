@@ -1,5 +1,5 @@
 import { AppEvent } from "@/app/types/event"
-import AddtListItem from "./AddtListItem.tsx"
+import AddListItem from "./AddListItem.tsx"
 
 type Props = {
   events: AppEvent[]
@@ -9,7 +9,7 @@ export default function AddsList({ events }: Props) {
   return (
     <>
       {events.map((event: AppEvent) => (
-        <AddtListItem add={event} key={event.id} />
+        <AddListItem add={event} key={event.id} />
       ))}
     </>
   )

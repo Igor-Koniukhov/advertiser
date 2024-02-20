@@ -1,16 +1,22 @@
-import { Button, Icon, Item, ItemGroup, List, Segment, SegmentGroup } from "semantic-ui-react"
+import {
+  Button,
+  Icon,
+  Item,
+  ItemGroup,
+  Label,
+  List,
+  Segment,
+  SegmentGroup,
+} from "semantic-ui-react"
 import AddListAttendee from "./AddListAttendee.tsx"
 import { AppEvent } from "@/app/types/event"
 import { Link } from "react-router-dom"
-import { useFirestore } from "@/app/hooks/firestore/useFirestore.ts"
 
 type Props = {
   add: AppEvent
 }
 
-export default function AddtListItem({ add }: Props) {
-  const { remove } = useFirestore("adds")
-
+export default function AddListItem({ add }: Props) {
   return (
     <SegmentGroup>
       <Segment>
@@ -20,6 +26,14 @@ export default function AddtListItem({ add }: Props) {
             <Item.Content>
               <Item.Header>{add.title}</Item.Header>
               <Item.Description>Hosted by {add.hostedBy}</Item.Description>
+              {add.isCancelled && (
+                <Label
+                  style={{ top: "-40px" }}
+                  ribbon="right"
+                  color="red"
+                  content="Add not active."
+                />
+              )}
             </Item.Content>
           </Item>
         </ItemGroup>
@@ -39,12 +53,7 @@ export default function AddtListItem({ add }: Props) {
       </Segment>
       <Segment clearing>
         <span>{add.description}</span>
-        <Button
-          onClick={() => remove(add.id as string)}
-          color="red"
-          floated="right"
-          content="Delete"
-        />
+        <Button color="red" floated="right" content="Delete" />
         <Button as={Link} to={`/adds/${add.id}`} color="teal" floated="right" content="View" />
       </Segment>
     </SegmentGroup>
