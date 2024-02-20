@@ -2,29 +2,15 @@ import { Button, Icon, Item, ItemGroup, List, Segment, SegmentGroup } from "sema
 import AddListAttendee from "./AddListAttendee.tsx"
 import { AppEvent } from "@/app/types/event"
 import { Link } from "react-router-dom"
-import { useState } from "react"
-import { deleteDoc, doc } from "@firebase/firestore"
-import { db } from "@/app/config/firebase.ts"
-import { toast } from "react-toastify"
+import { useFirestore } from "@/app/hooks/firestore/useFirestore.ts"
 
 type Props = {
   add: AppEvent
 }
 
 export default function AddtListItem({ add }: Props) {
-  const [loading, setLoading] = useState(false)
+  const { remove } = useFirestore("adds")
 
-  const removeAddvertise = async () => {
-    setLoading(true)
-    try {
-      await deleteDoc(doc(db, "adds", add.id as string))
-    } catch (error: unknown) {
-      console.log(error)
-      toast.error((error as Error).message)
-    } finally {
-      setLoading(false)
-    }
-  }
   return (
     <SegmentGroup>
       <Segment>
@@ -54,8 +40,7 @@ export default function AddtListItem({ add }: Props) {
       <Segment clearing>
         <span>{add.description}</span>
         <Button
-          loading={loading}
-          onClick={removeAddvertise}
+          onClick={() => remove(add.id as string)}
           color="red"
           floated="right"
           content="Delete"

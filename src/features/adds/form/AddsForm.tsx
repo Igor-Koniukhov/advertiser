@@ -7,40 +7,60 @@ import { categoryOptions } from "@/features/adds/form/categoryOptions.ts"
 import DataPicker from "react-datepicker"
 import "react-datepicker/dist/react-datepicker.css"
 import { AppEvent } from "@/app/types/event.ts"
-import { db } from "@/app/config/firebase.ts"
-import { collection, doc, setDoc, Timestamp, updateDoc } from "@firebase/firestore"
+import { Timestamp } from "@firebase/firestore"
 import { toast } from "react-toastify"
+import { useFirestore } from "@/app/hooks/firestore/useFirestore.ts"
+import { useEffect } from "react"
+import { LoadingComponent } from "@/app/layout/LoadingComponent.tsx"
+import { actions } from "@/features/adds/addsSlice.ts"
 
 export default function AddsForm() {
+  const { loadDocument, create, update } = useFirestore("adds")
+  const { id } = useParams()
+  const add = useAppSelector((state) => state.adds.data.find((e) => e.id === id))
   const {
     register,
     handleSubmit,
     control,
     setValue,
     formState: { errors, isValid, isSubmitting },
-  } = useForm({ mode: "onTouched" })
-  const { id } = useParams()
-  const add = useAppSelector((state) => state.adds.adds.find((e) => e.id === id))
+  } = useForm({
+    mode: "onTouched",
+    defaultValues: async () => {
+      if (add) return { ...add, date: new Date(add.date) }
+    },
+  })
+
+  const { status } = useAppSelector((state) => state.adds)
   const navigate = useNavigate()
+
+  useEffect(() => {
+    if (!id) return
+    loadDocument(id, actions)
+  }, [id, loadDocument])
 
   const updateAddvertise = async (data: AppEvent) => {
     if (!add) return
-    const docRef = doc(db, "adds", add.id as string)
-    await updateDoc(docRef, {
+    await update(data.id as string, {
       ...data,
       date: Timestamp.fromDate(data.date as unknown as Date),
     })
   }
   const createAddvertise = async (data: FieldValues) => {
-    const newEventRef = doc(collection(db, "adds"))
-    await setDoc(newEventRef, {
+    return await create({
       ...data,
       hostedBy: "bob",
       attendees: [],
       hostPhotoURL: "",
       date: Timestamp.fromDate(data.date as unknown as Date),
     })
-    return newEventRef
+  }
+
+  const handleCancelToggle = async (add: AppEvent) => {
+    await update(add.id as string, {
+      isCancelled: !add.isCancelled,
+    })
+    toast.success(`Add has been ${add.isCancelled ? "uncancelled" : "cancelled"}`)
   }
 
   const onSubmit = async (data: FieldValues) => {
@@ -50,12 +70,13 @@ export default function AddsForm() {
         navigate(`/adds/${add.id}`)
       } else {
         const ref = await createAddvertise(data)
-        navigate(`/adds/${ref.id}`)
+        navigate(`/adds/${ref?.id}`)
       }
     } catch (error) {
       toast.error((error as unknown as Error).message as string)
     }
   }
+  if (status === "loading") return <LoadingComponent />
 
   return (
     <>
@@ -122,6 +143,15 @@ export default function AddsForm() {
               )}
             />
           </Form.Field>
+          {add && (
+            <Button
+              type="button"
+              floated="left"
+              color={add.isCancelled ? "green" : "red"}
+              onClick={() => handleCancelToggle(add)}
+              content={add.isCancelled ? "Reactivate" : "Cancel add"}
+            />
+          )}
           <Button
             loading={isSubmitting}
             disabled={!isValid}

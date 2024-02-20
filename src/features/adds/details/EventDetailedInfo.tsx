@@ -2,9 +2,9 @@ import { Button, Grid, Icon, Segment } from "semantic-ui-react"
 import { AppEvent } from "@/app/types/event.ts"
 
 type Props = {
-  event: AppEvent
+  add: AppEvent
 }
-export const EventDetailedInfo = ({ event }: Props) => {
+export const EventDetailedInfo = ({ add }: Props) => {
   return (
     <>
       <Segment.Group>
@@ -14,7 +14,7 @@ export const EventDetailedInfo = ({ event }: Props) => {
               <Icon size="large" color="teal" name="info" />
             </Grid.Column>
             <Grid.Column width={15}>
-              <p>{event.description}</p>
+              <p>{add.description}</p>
             </Grid.Column>
           </Grid>
         </Segment>
@@ -24,7 +24,7 @@ export const EventDetailedInfo = ({ event }: Props) => {
               <Icon name="calendar" size="large" color="teal" />
             </Grid.Column>
             <Grid.Column width={15}>
-              <span>{event.date}</span>
+              <span>{add.date}</span>
             </Grid.Column>
           </Grid>
         </Segment>
@@ -34,7 +34,7 @@ export const EventDetailedInfo = ({ event }: Props) => {
               <Icon name="marker" size="large" color="teal" />
             </Grid.Column>
             <Grid.Column width={11}>
-              <span>{event.venue}</span>
+              <span>{add.venue}</span>
             </Grid.Column>
             <Grid.Column width={4}>
               <Button color="teal" size="tiny" content="Show Map" />

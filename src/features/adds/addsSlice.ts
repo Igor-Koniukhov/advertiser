@@ -1,22 +1,24 @@
 import { AppEvent } from "@/app/types/event.ts"
-import { createSlice, PayloadAction } from "@reduxjs/toolkit"
+import { PayloadAction } from "@reduxjs/toolkit"
 import { Timestamp } from "@firebase/firestore"
+import { createGenericSlice, GenericActions, GenericState } from "@/app/store/genericSlice.ts"
 
 type State = {
-  adds: AppEvent[]
+  data: AppEvent[]
 }
 
 const initialState: State = {
-  adds: [],
+  data: [],
 }
 
-export const addsSlice = createSlice({
+export const addsSlice = createGenericSlice({
   name: "adds",
-  initialState,
+  initialState: initialState as GenericState<AppEvent[]>,
   reducers: {
-    setAdds: {
+    success: {
       reducer: (state, action: PayloadAction<AppEvent[]>) => {
-        state.adds = action.payload
+        state.data = action.payload
+        state.status = "finished"
       },
       prepare: (adds) => {
         let addsArray: AppEvent[] = []
@@ -30,4 +32,4 @@ export const addsSlice = createSlice({
   },
 })
 
-export const { setAdds } = addsSlice.actions
+export const actions = addsSlice.actions as GenericActions<AppEvent[]>

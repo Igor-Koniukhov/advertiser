@@ -1,38 +1,19 @@
 import { Grid } from "semantic-ui-react"
 import AddsList from "./AddsList.tsx"
-import { useAppDispatch, useAppSelector } from "@/app/store/store.ts"
-import { useEffect, useState } from "react"
-import { collection, onSnapshot, query } from "@firebase/firestore"
-import { db } from "@/app/config/firebase.ts"
-import { AppEvent } from "@/app/types/event.ts"
-import { setAdds } from "@/features/adds/addsSlice.ts"
+import { useAppSelector } from "@/app/store/store.ts"
+import { useEffect } from "react"
+import { actions } from "@/features/adds/addsSlice.ts"
 import { LoadingComponent } from "@/app/layout/LoadingComponent.tsx"
+import { useFirestore } from "@/app/hooks/firestore/useFirestore.ts"
 
 export default function AddsDashboard() {
-  const { adds } = useAppSelector((state) => state.adds)
-  const dispatch = useAppDispatch()
-  const [loading, setLoading] = useState(true)
+  const { data: adds, status } = useAppSelector((state) => state.adds)
+  const { loadCollection } = useFirestore("adds")
 
   useEffect(() => {
-    const q = query(collection(db, "adds"))
-    const unsubscribe = onSnapshot(q, {
-      next: (querySnapshot) => {
-        const evts: AppEvent[] = []
-        querySnapshot.forEach((doc) => {
-          evts.push({ id: doc.id, ...doc.data() } as AppEvent)
-        })
-        dispatch(setAdds(evts))
-        setLoading(false)
-      },
-      error: (err) => {
-        console.log(err)
-        setLoading(false)
-      },
-      complete: () => console.log("never will see this!"),
-    })
-    return () => unsubscribe()
-  }, [dispatch])
-  if (loading) return <LoadingComponent />
+    loadCollection(actions)
+  }, [loadCollection])
+  if (status === "loading") return <LoadingComponent />
   return (
     <Grid>
       <Grid.Column width={10}>
