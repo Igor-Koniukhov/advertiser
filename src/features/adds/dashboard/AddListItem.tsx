@@ -11,12 +11,14 @@ import {
 import AddListAttendee from "./AddListAttendee.tsx"
 import { AppEvent } from "@/app/types/event"
 import { Link } from "react-router-dom"
+import { useFirestore } from "@/app/hooks/firestore/useFirestore.ts"
 
 type Props = {
   add: AppEvent
 }
 
 export default function AddListItem({ add }: Props) {
+  const { remove } = useFirestore("adds")
   return (
     <SegmentGroup>
       <Segment>
@@ -53,7 +55,12 @@ export default function AddListItem({ add }: Props) {
       </Segment>
       <Segment clearing>
         <span>{add.description}</span>
-        <Button color="red" floated="right" content="Delete" />
+        <Button
+          onClick={() => remove(add.id as string)}
+          color="red"
+          floated="right"
+          content="Delete"
+        />
         <Button as={Link} to={`/adds/${add.id}`} color="teal" floated="right" content="View" />
       </Segment>
     </SegmentGroup>

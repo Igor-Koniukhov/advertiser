@@ -8,19 +8,19 @@ export const sampleData = [
     description:
       "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus sollicitudin ligula eu leo tincidunt, quis scelerisque magna dapibus. Sed eget ipsum vel arcu vehicula ullamcorper.",
     city: "NY, USA",
-    venue: "Empire State Building, 5th Avenue, New York, NY, USA",
+    venue: "Trip to Empire State Building, 5th Avenue, New York, NY, USA",
     hostedBy: "Bob",
-    hostPhotoURL: "https://randomuser.me/api/portraits/men/20.jpg",
+    hostPhotoURL: "",
     attendees: [
       {
         id: "a",
         name: "Bob",
-        photoURL: "https://randomuser.me/api/portraits/men/20.jpg",
+        photoURL: "",
       },
       {
         id: "b",
         name: "Tom",
-        photoURL: "https://randomuser.me/api/portraits/men/22.jpg",
+        photoURL: "",
       },
     ],
   },
@@ -32,19 +32,19 @@ export const sampleData = [
     description:
       "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus sollicitudin ligula eu leo tincidunt, quis scelerisque magna dapibus. Sed eget ipsum vel arcu vehicula ullamcorper.",
     city: "London, UK",
-    venue: "Punch & Judy, Henrietta Street, London, UK",
+    venue: "Visite some places",
     hostedBy: "Tom",
-    hostPhotoURL: "https://randomuser.me/api/portraits/men/22.jpg",
+    hostPhotoURL: "",
     attendees: [
       {
         id: "a",
         name: "Bob",
-        photoURL: "https://randomuser.me/api/portraits/men/20.jpg",
+        photoURL: "",
       },
       {
         id: "b",
         name: "Tom",
-        photoURL: "https://randomuser.me/api/portraits/men/22.jpg",
+        photoURL: "",
       },
     ],
   },

@@ -1,13 +1,15 @@
 import { ModalsWrapper } from "@/app/common/modals/ModalsWrapper.tsx"
 import { FieldValues, useForm } from "react-hook-form"
-import { Button, Divider, Form, Label } from "semantic-ui-react"
+import { Button, Form, Label } from "semantic-ui-react"
 import { useAppDispatch } from "@/app/store/store.ts"
 import { closeModal } from "@/app/common/modals/modalSlice.ts"
-import { signInWithEmailAndPassword } from "@firebase/auth"
+import { createUserWithEmailAndPassword, updateProfile } from "@firebase/auth"
 import { auth } from "@/app/config/firebase.ts"
-import { SocialLogin } from "@/features/auth/SocialLogin.tsx"
+import { useFirestore } from "@/app/hooks/firestore/useFirestore.ts"
+import { Timestamp } from "@firebase/firestore"
 
-export const LoginForm = () => {
+export const RegisterForm = () => {
+  const { set } = useFirestore("profiles")
   const {
     register,
     handleSubmit,
@@ -19,7 +21,15 @@ export const LoginForm = () => {
   const dispatch = useAppDispatch()
   const onSubmit = async (data: FieldValues) => {
     try {
-      await signInWithEmailAndPassword(auth, data.email, data.password)
+      const userCreds = await createUserWithEmailAndPassword(auth, data.email, data.password)
+      await updateProfile(userCreds.user, {
+        displayName: data.displayName,
+      })
+      await set(userCreds.user.uid, {
+        displayName: data.displayName,
+        email: data.email,
+        createdAt: Timestamp.now(),
+      })
       dispatch(closeModal())
     } catch (error: any) {
       setError("root.serverError", {
@@ -29,8 +39,16 @@ export const LoginForm = () => {
     }
   }
   return (
-    <ModalsWrapper header="Sign into re-events" size="mini">
+    <ModalsWrapper header="Register to Advertaser">
       <Form onSubmit={handleSubmit(onSubmit)}>
+        <Form.Input
+          defaultValue=""
+          placeholder="Display name"
+          {...register("displayName", {
+            required: true,
+          })}
+          error={errors.displayName && "Display name is required"}
+        />
         <Form.Input
           type="email"
           defaultValue=""
@@ -66,10 +84,8 @@ export const LoginForm = () => {
           fluid
           size="large"
           color="teal"
-          content="Login"
+          content="Register"
         />
-        <Divider horizontal>Or</Divider>
-        <SocialLogin />
       </Form>
     </ModalsWrapper>
   )

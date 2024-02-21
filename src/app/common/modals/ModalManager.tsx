@@ -1,9 +1,11 @@
 import { LoginForm } from "@/features/auth/LoginForm.tsx"
 import { useAppSelector } from "@/app/store/store.ts"
+import { RegisterForm } from "@/features/auth/RegisterForm.tsx"
 
 export const ModalManager = () => {
   const modalLookup = {
     LoginForm,
+    RegisterForm,
   }
   const { type, data, open } = useAppSelector((state) => state.modals)
   let renderModal
