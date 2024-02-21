@@ -19,7 +19,7 @@ export const SocialLogin = () => {
     provider: null,
   })
 
-  const { set } = useFirestore("profile")
+  const { set } = useFirestore("profiles")
   const dispatch = useAppDispatch()
   const handleSocialLogin = async (selectedProvider: string) => {
     setStatus({ loading: true, provider: selectedProvider })
