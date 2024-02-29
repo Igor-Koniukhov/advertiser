@@ -11,10 +11,18 @@ export const SignInMenu = () => {
     await signOut(auth)
     navigate("/")
   }
+  console.log(currentUser)
   return (
     <Menu.Item position="right">
-      <Image avatar spaced="right" src={currentUser?.photoURL || "/user.png"} />
-      <Dropdown pointing="top left" text={currentUser?.displayName as string}>
+      <Image
+        avatar
+        spaced="right"
+        src={currentUser?.photoURL ? currentUser?.photoURL : "/user.png"}
+      />
+      <Dropdown
+        pointing="top left"
+        text={currentUser?.displayName ? currentUser?.displayName : ("" as string)}
+      >
         <Dropdown.Menu>
           <Dropdown.Item as={Link} to="/createEvent" text="Create event" icon="plus" />
           <Dropdown.Item

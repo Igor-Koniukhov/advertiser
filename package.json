@@ -19,6 +19,7 @@
     "filepond-plugin-image-transform": "^3.8.7",
     "firebase": "^10.8.0",
     "react": "^18.2.0",
+    "react-calendar": "^4.8.0",
     "react-datepicker": "^6.1.0",
     "react-dom": "^18.2.0",
     "react-filepond": "^7.1.2",
@@ -27,7 +28,8 @@
     "react-router-dom": "^6.22.1",
     "react-toastify": "^10.0.4",
     "semantic-ui-css": "^2.5.0",
-    "semantic-ui-react": "^3.0.0-beta.2"
+    "semantic-ui-react": "^3.0.0-beta.2",
+    "use-places-autocomplete": "^4.0.1"
   },
   "devDependencies": {
     "@types/react": "^18.2.55",

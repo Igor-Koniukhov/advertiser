@@ -27,10 +27,26 @@ export default function AddListItem({ add }: Props) {
             <Item.Image size="tiny" circular src={add.hostPhotoURL || "/user.png"} />
             <Item.Content>
               <Item.Header>{add.title}</Item.Header>
+              {add.isHost && (
+                <Icon
+                  name="trash"
+                  onClick={() => remove(add.id as string)}
+                  floated="right"
+                  style={{
+                    color: "red",
+                    cursor: "pointer",
+                    display: "block",
+                    float: "right",
+                    alignSelf: "center",
+                    margin: "auto auto",
+                  }}
+                />
+              )}
               <Item.Description>Hosted by {add.hostedBy}</Item.Description>
+
               {add.isCancelled && (
                 <Label
-                  style={{ top: "-40px" }}
+                  style={{ top: "-30px" }}
                   ribbon="right"
                   color="red"
                   content="Add not active."
@@ -55,12 +71,6 @@ export default function AddListItem({ add }: Props) {
       </Segment>
       <Segment clearing>
         <span>{add.description}</span>
-        <Button
-          onClick={() => remove(add.id as string)}
-          color="red"
-          floated="right"
-          content="Delete"
-        />
         <Button as={Link} to={`/adds/${add.id}`} color="teal" floated="right" content="View" />
       </Segment>
     </SegmentGroup>

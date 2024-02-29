@@ -1,24 +1,54 @@
-/**
- * Import function triggers from their respective submodules:
- *
- * import {onCall} from "firebase-functions/v2/https";
- * import {onDocumentWritten} from "firebase-functions/v2/firestore";
- *
- * See a full list of supported triggers at https://firebase.google.com/docs/functions
- */
-
-import { onRequest } from "firebase-functions/v2/https";
+import {
+  onDocumentCreated,
+  onDocumentDeleted,
+  onDocumentUpdated,
+} from "firebase-functions/v2/firestore";
 import * as logger from "firebase-functions/logger";
-import { onDocumentWritten } from "firebase-functions/lib/v2/providers/firestore";
-import { AppEvent } from "../../src/app/types/event";
+import * as functions from "firebase-functions";
+import * as admin from "firebase-admin";
+import { generateThumbnail } from "./thumbnails";
 
-export const helloWorld = onRequest((request, response) => {
-  logger.info("Hello logs!", { structuredData: true });
-  response.send("Hello from Firebase!");
+admin.initializeApp();
+
+exports.userAdded = functions.auth.user().onCreate((user) => {
+  const userEmail = user.email;
+  const userId = user.uid;
+
+  console.log(`New user: ${userId} with email: ${userEmail}`);
 });
 
-export const eventWritten = onDocumentWritten("adds/{docId}", async (event) => {
-  logger.info("===Event Written start===");
-  const beforeData = event.data?.before.data() as AppEvent;
-  console.log(beforeData);
+exports.fileAdded = functions.storage.object().onFinalize((object) => {
+  const filePath = object.name;
+  const fileSize = object.size;
+  console.log(`File was added: ${filePath}, size: ${fileSize}`);
 });
+
+export const logDocumentAddition = onDocumentCreated(
+  "/adds/{docId}",
+  (event) => {
+    logger.info("Document added", {
+      docId: event.params.docId,
+      data: event.data,
+    });
+  },
+);
+
+export const logDocumentUpdate = onDocumentUpdated("/adds/{docId}", (event) => {
+  logger.info("Document updated", {
+    docId: event.params.docId,
+    before: event.data?.before.data(),
+    after: event.data?.after.data(),
+  });
+});
+
+export const logDocumentDeletion = onDocumentDeleted(
+  "/adds/{docId}",
+  (event) => {
+    logger.info("Document deleted", {
+      docId: event.params.docId,
+      data: event.data?.data(),
+    });
+  },
+);
+
+export { generateThumbnail };

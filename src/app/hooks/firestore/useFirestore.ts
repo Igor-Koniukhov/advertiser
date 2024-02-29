@@ -12,6 +12,8 @@ import {
 } from "@firebase/firestore"
 import { db } from "@/app/config/firebase.ts"
 import { toast } from "react-toastify"
+import { CollectionOptions } from "@/app/hooks/firestore/hooks.ts"
+import { getQuery } from "@/app/hooks/firestore/getQuery.ts"
 
 type ListenerState = {
   name?: string
@@ -36,9 +38,9 @@ export const useFirestore = <T extends DocumentData>(path: string) => {
 
   const dispatch = useAppDispatch()
   const loadCollection = useCallback(
-    (actions: GenericActions<T>) => {
+    (actions: GenericActions<T>, options?: CollectionOptions) => {
       dispatch(actions.loading())
-      const query = collection(db, path)
+      const query = getQuery(path, options)
       const listener = onSnapshot(query, {
         next: (querySnapshot) => {
           const data: DocumentData[] = []

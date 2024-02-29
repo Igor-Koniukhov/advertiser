@@ -7,7 +7,7 @@ import { categoryOptions } from "@/features/adds/form/categoryOptions.ts"
 import DataPicker from "react-datepicker"
 import "react-datepicker/dist/react-datepicker.css"
 import { AppEvent } from "@/app/types/event.ts"
-import { Timestamp } from "@firebase/firestore"
+import { arrayUnion, Timestamp } from "@firebase/firestore"
 import { toast } from "react-toastify"
 import { useFirestore } from "@/app/hooks/firestore/useFirestore.ts"
 import { useEffect } from "react"
@@ -32,6 +32,7 @@ export default function AddsForm() {
   })
 
   const { status } = useAppSelector((state) => state.adds)
+  const { currentUser } = useAppSelector((state) => state.auth)
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -39,19 +40,26 @@ export default function AddsForm() {
     loadDocument(id, actions)
   }, [id, loadDocument])
 
-  const updateAddvertise = async (data: AppEvent) => {
+  const updateAdvertise = async (data: AppEvent) => {
     if (!add) return
     await update(data.id as string, {
       ...data,
       date: Timestamp.fromDate(data.date as unknown as Date),
     })
   }
-  const createAddvertise = async (data: FieldValues) => {
+  const createAdvertise = async (data: FieldValues) => {
+    if (!currentUser) return
     return await create({
       ...data,
-      hostedBy: "bob",
-      attendees: [],
-      hostPhotoURL: "",
+      hostUid: currentUser?.uid,
+      hostedBy: currentUser?.displayName,
+      hostPhotoURL: currentUser.photoURL,
+      attendees: arrayUnion({
+        id: currentUser.uid,
+        displayName: currentUser.displayName,
+        photoURL: currentUser.photoURL,
+      }),
+      attendeeIds: arrayUnion(currentUser.uid),
       date: Timestamp.fromDate(data.date as unknown as Date),
     })
   }
@@ -66,10 +74,10 @@ export default function AddsForm() {
   const onSubmit = async (data: FieldValues) => {
     try {
       if (add) {
-        await updateAddvertise({ ...add, ...data })
+        await updateAdvertise({ ...add, ...data })
         navigate(`/adds/${add.id}`)
       } else {
-        const ref = await createAddvertise(data)
+        const ref = await createAdvertise(data)
         navigate(`/adds/${ref?.id}`)
       }
     } catch (error) {

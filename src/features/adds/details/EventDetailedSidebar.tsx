@@ -1,6 +1,10 @@
-import { Item, Segment } from "semantic-ui-react"
-
-export const EventDetailedSidebar = () => {
+import { Item, Label, Segment } from "semantic-ui-react"
+import { AppEvent } from "@/app/types/event.ts"
+import { Link } from "react-router-dom"
+type Props = {
+  add: AppEvent
+}
+export const EventDetailedSidebar = ({ add }: Props) => {
   return (
     <>
       <Segment
@@ -11,26 +15,25 @@ export const EventDetailedSidebar = () => {
         inverted
         color="teal"
       >
-        2 People Going
+        {add.attendees?.length} People Going
       </Segment>
       <Segment attached>
         <Item.Group relaxed divided>
-          <Item style={{ position: "relative" }}>
-            <Item.Image size="tiny" src="/user.png" />
-            <Item.Content verticalAlign="middle">
-              <Item.Header as="h3">
-                <span>Tom</span>
-              </Item.Header>
-            </Item.Content>
-          </Item>
-          <Item style={{ position: "relative" }}>
-            <Item.Image size="tiny" src="/user.png" />
-            <Item.Content verticalAlign="middle">
-              <Item.Header as="h3">
-                <span>Bob</span>
-              </Item.Header>
-            </Item.Content>
-          </Item>
+          {add.attendees!.map((attendee) => (
+            <Item style={{ position: "relative" }} key={attendee.id}>
+              {add.hostUid === attendee.id && (
+                <Label style={{ position: "absolute" }} color="orange" ribbon="right">
+                  Host
+                </Label>
+              )}
+              <Item.Image size="tiny" src={attendee.photoURL} />
+              <Item.Content verticalAlign="middle">
+                <Item.Header as={Link} to={`/profiles/${attendee.id}`}>
+                  <span>{attendee.displayName}</span>
+                </Item.Header>
+              </Item.Content>
+            </Item>
+          ))}
         </Item.Group>
       </Segment>
     </>
